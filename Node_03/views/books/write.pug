@@ -22,8 +22,8 @@ block body
             })
             $('#btn_delete').click(function(){
                 if(confirm('삭제할까요')){
-                    let id = $(this).data('id')
-                    document.location.replace('/book/delete/'+id)
+                    //let id = $(this).data('id')
+                    document.location.replace('/book/delete/#{book._id}')
                 }
             })
             $('#btn_list').click(function(){
