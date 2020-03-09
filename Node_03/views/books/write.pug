@@ -23,6 +23,7 @@ block body
             $('#btn_delete').click(function(){
                 if(confirm('삭제할까요')){
                     //let id = $(this).data('id')
+                    // router에서 보낸 json 데이터를 js 코드에 포함할 때 '#{}'
                     document.location.replace('/book/delete/#{book._id}')
                 }
             })

@@ -1,0 +1,3 @@
+express -ejs Node_05
+npm install
+npm install -s ejs

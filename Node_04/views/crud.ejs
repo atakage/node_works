@@ -33,6 +33,12 @@
                 })
 
             })
+
+            $('#btn_delete').click(function(){
+                $.ajax({
+                    url:"crud/book/30/delete", type:"delete"
+                })
+            })
         })
     </script>
     <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
