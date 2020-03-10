@@ -1,0 +1,7 @@
+jdk 1.8
+sts
+oracle 11g xe
+sql developer
+mysql 8.0
+mongodb
+nodejs
