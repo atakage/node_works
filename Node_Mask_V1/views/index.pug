@@ -1,0 +1,74 @@
+extends layout
+
+block content
+  script(src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appkey=" + tmap_api)
+  script.
+    $(function(){
+
+      // 마커를 찍기 위한 위, 경도 데이터를 배열로 선언 잡기
+      // router에서 보낸 데이터를 pug파일의 js코드에서 캐치
+
+      let marketList = !{JSON.stringify(stores)}
+
+      // 검색한 데이터의 가장 마지막 데이터의 좌표
+      let initLat = marketList[marketList.length -1].lat
+      let initLng = marketList[marketList.length -1].lng
+        var map = new Tmapv2.Map('map_div',{
+          
+          width:'90%',
+          height:'500px',
+          center: new Tmapv2.LatLng(initLat, initLng),
+          zoom:15
+
+        })
+
+        map.addListener('click',function(e){
+
+          var lnglat = e.latLng
+          maker = new Tmapv2.Marker({
+            position : new Tmapv2.LatLng(lnglat.lat(),lnglat.lng()),
+            map : map
+          })
+
+        })
+
+        let market = {}
+
+        marketList.forEach(function(market){
+          new Tmapv2.Marker({
+
+            position : new Tmapv2.LatLng(market.lat, market.lng),
+            map : map,
+            title : market.name + "<br>" + market.addr + "<br>" + market.remain_stat
+          })
+
+          })
+        })
+
+        // 마커 찍기
+
+  style.
+    #map_div{
+      margin:20px auto;
+    }
+
+  div#map_div.w3-container-fluid
+
+  .market_list.w3-container-fluid
+    table.w3-table.w3-table-all
+      tr 이름
+        th 이름
+        th 주소
+        th 위도
+        th 경도
+        th 재고상태
+
+      - var remain = {'plenty':'충분(100개이상)','some':'보통(~30)', 'few' : '부족(~2)', 'empty' : '없음' }  
+
+      each market, index in stores
+        tr
+          td= market.name
+          td= market.addr
+          td= market.lng
+          td= market.lat
+          td= remain[market.remain_stat]

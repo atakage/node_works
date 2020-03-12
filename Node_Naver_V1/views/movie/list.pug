@@ -1,0 +1,28 @@
+extends ../layout
+
+block content
+
+
+
+    each movie,index in movies
+    
+        div.card(style="width:400px; border: 2px solid black; text-align:center;")
+            if(movie.image.length > 0)
+                p(style="padding-top:10%;")
+                    img(src=movie.image)
+            else
+                div(style="text-align: center;padding-top: 10%;font-size: xx-large;font-weight: bold;line-height: 115px;")
+                    p(style="") 이미지 없음
+        
+            
+            div.card-body
+                p(style="border-top:1px solid black")
+                    // HTML 코드에 보이는 주석
+                    // -- HTML 코드에 보이지 않는  주석
+                    // !{} : html tag가 포함된 문자열을 tag 반영하며 표현
+                    a(href=movie.link) !{movie.title}
+                p(style="border-bottom:1px solid black")= movie.subtitle
+                p= movie.pubDate
+                p= movie.director
+                p= movie.actor
+                p= movie.userRating
