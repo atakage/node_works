@@ -1,0 +1,10 @@
+doctype html
+html
+  head
+    title= 검색페이지
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    block content
+
+    form(action="/naver/list", method='get')
+        input(name='searchVal' placeholder='입력')

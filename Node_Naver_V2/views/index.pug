@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+
+                      p= whereVal
+
+
+                        if(bookList)
+                          each book,index in bookList
+                            p= book.title
+                            p= book.link
+                            p= book.image
+                            p= book.author
+                            p= book.price
+                            p= book.discout
+                            p= book.publisher
+                            p= book.pubdate
+                            p= book.isbn
+                            p= book.description
+                            p= book.searchVal
+
+  
