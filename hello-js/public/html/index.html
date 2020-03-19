@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript">
+      // 첫 번째 p tag가 클릭되었을 때 반응할 event handler
+      function myClick() {
+        alert("나는 첫 번째 p tag");
+      }
+
+      function my2Click(text) {
+        alert("나는" + text + "입니다");
+      }
+
+      // java코드에서는 function(text)라는 메서드를 호출하여 그 return된 결과를 my3Click에 담으라는 것인데
+      // js코드에서는 my3Click 이라는 이름으로 함수를 선언하겠다는 의미
+      var my3Click = function(text) {
+        alert("우리는" + text + "입니다");
+      };
+
+      // ES5부터 사용되긴 시작한 화살표 함수
+      var my4Click = (text1, text2) => {
+        alert(text1 + text2);
+      };
+    </script>
+    <style>
+      p {
+        border: 1px solid blue;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <p onclick="myClick()">나는 첫 번째 p태그입니다</p>
+    <p onclick="my2Click('홍길동')">나는 두 번째 p태그입니다</p>
+    <p onclick="my3Click('자랑스러운 대한민국')">나는 세 번째 p태그입니다</p>
+    <p onclick="my4Click('Korea는','대한민국')">
+      나는 네 번째 p태그입니다
+    </p>
+  </body>
+</html>
