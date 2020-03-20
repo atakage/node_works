@@ -42,4 +42,26 @@ router.post("/insert", (req, res) => {
   });
 });
 
+router.put("/", (req, res) => {
+  console.log(req.body);
+
+  bbsVO
+    .update({ _id: req.body._id }, { $set: req.body })
+    .exec((err, result) => {
+      res.json(result);
+    });
+});
+
+router.delete("/", (req, res) => {
+  console.log("바디값:", req.body);
+
+  bbsVO.deleteOne({ _id: req.body._id }).exec((err, data) => {
+    if (err) {
+      res.json(err);
+    } else {
+      res.json(data);
+    }
+  });
+});
+
 module.exports = router;
