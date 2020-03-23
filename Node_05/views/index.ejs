@@ -1,82 +1,76 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Page Title</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
 
-
   <script>
-  
-  
-    $(function(){
+    $(function() {
+      $(".trClass").click(function() {
+        var bTitle = $(this)
+          .find(".bTitle")
+          .text();
+        var bWriter = $(this)
+          .find(".bWriter")
+          .text();
+        var bComp = $(this)
+          .find(".bComp")
+          .text();
+        var bPrice = $(this)
+          .find(".bPrice")
+          .text();
 
-      
-      $('.trClass').click(function(){
-
-        var bTitle = $(this).find('.bTitle').text()
-        var bWriter = $(this).find('.bWriter').text()
-        var bComp = $(this).find('.bComp').text()
-        var bPrice = $(this).find('.bPrice').text()
-
-     
-
-       document.location.href = '/book/update?bTitle='+ bTitle + "&bWriter=" +bWriter + "&bComp=" + bComp + "&bPrice=" + bPrice 
-
-      })
-     
-
-    })
-
-
-  
+        document.location.href =
+          "/book/update?bTitle=" +
+          bTitle +
+          "&bWriter=" +
+          bWriter +
+          "&bComp=" +
+          bComp +
+          "&bPrice=" +
+          bPrice;
+      });
+    });
   </script>
-
 
   <body>
     <h1><%= title %></h1>
-    
-
-  
 
     <table>
-    
-    <tr>
-    <th>제목</th>
-    <th>작가</th>
-    <th>출판사</th>
-    <th>가격</th>
-    </tr>
+      <tr>
+        <th>제목</th>
+        <th>작가</th>
+        <th>출판사</th>
+        <th>가격</th>
+      </tr>
 
-  <% book.forEach(function(b){ %>
-
-
-    <% if(book == null){ %>
+      <% book.forEach(function(b){ %> <% if(book == null){ %>
 
       <tr>
         <td colspan="4">데이터 없음</td>
       </tr>
 
-    <% } %>
+      <% } %>
 
+      <tr class="trClass">
+        <div style="display: hidden;"><%- b._id %></div>
+        <td class="bTitle"><%- b.bTitle %></td>
+        <td class="bWriter"><%- b.bWriter %></td>
+        <td class="bComp"><%- b.bComp %></td>
+        <td class="bPrice"><%- b.bPrice %></td>
+      </tr>
 
-    <tr class="trClass">
-    <div style="display: hidden;"><%- b._id %></div>
-    <td class="bTitle"><%- b.bTitle %></td>
-    <td class="bWriter"><%- b.bWriter %></td>
-    <td class="bComp"><%- b.bComp %></td>
-    <td class="bPrice"><%- b.bPrice %></td>
+      <% }) %>
+    </table>
 
-    </tr>
-
-  <% }) %>
-  </table>
-  <button type="button" onclick="document.location.href='/book/insert'">추가</button>
-    
+    <button type="button" onclick="document.location.href='/book/insert'">
+      추가
+    </button>
   </body>
 </html>

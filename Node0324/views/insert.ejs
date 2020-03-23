@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+  </head>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    $(function() {
+      $("#insertButton").click(function() {
+        // 서버에서 공백검사
+        if ($("#title").val().length < 1) {
+          alert("제목을 입력핫요");
+          return false;
+        }
+
+        $("form").submit();
+      });
+
+      $(".deleteButton").click(function() {
+        if (confirm("정말 삭제?")) {
+          var formData = $("form").serialize();
+
+          $.ajax({
+            url: "/list/delete",
+            data: formData,
+            type: "post",
+            success: function(result) {
+              alert(result);
+              document.location.href = "/";
+            },
+            error: function() {
+              alert("서버 에러");
+            }
+          });
+        }
+        return false;
+      });
+    });
+  </script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <body>
+    <form action="/list/insert" method="post">
+      <input type="hidden" name="_id" value="<%= list._id %>" />
+
+      <div>
+        <input
+          id="title"
+          name="title"
+          placeholder="제목"
+          value="<%= list.title %>"
+        />
+      </div>
+      <div>
+        <textarea id="content" name="content" placeholder="내용">
+<%= list.content %></textarea
+        >
+        <input name="insertDate" type="hidden" />
+      </div>
+
+      <button type="button" onclick="document.location.href='/'">홈으로</button>
+      <button id="insertButton" type="button">작성완료</button>
+
+      <% if(delBtn == "OK"){ %>
+
+      <button class="deleteButton" type="button">삭제</button>
+
+      <% }%>
+    </form>
+  </body>
+</html>
