@@ -6,18 +6,19 @@ var listVO = require("../models/listVO");
 router.get("/insert", function(req, res) {
   var list = new listVO(req.body);
 
-  res.render("insert", { list: list, delBtn: "none" });
+  res.render("insert", { list: list, delBtn: "x", insertBtn: "OK" });
 });
 
 router.post("/insert", function(req, res) {
+  req.body.cDate = "";
+  req.body.complete = "";
+
   req.body.insertDate =
     moment().format("YYYY-MM-DD") + "(" + moment().format("HH:mm:ss") + ")";
 
   var list = new listVO(req.body);
 
   var _id = req.body._id;
-
-  console.log("인서트 포스트 리퀘바디", req.body);
 
   // 왜 listVO가 들어가는지?
   listVO.findOne({ _id: _id }, function(err, result) {
@@ -33,25 +34,20 @@ router.post("/insert", function(req, res) {
     }
   });
 
-  // 새로 작성
-
-  //   if (req.body.title.trim().length < 1) {
-  //     //   var list = new listVO(req.body);
-  //     res.render("insert", {
-  //       insertAlert: "제목을 다시 입력하세요",
-  //       list: list,
-  //       delBtn: "none"
-  //     });
-  //   }
-
   // 기존 것 업데이트
 });
 
-router.get("/update/:_id", function(req, res) {
+router.get("/update/:_id/:complete", function(req, res) {
   var _id = req.params._id;
+  //var completeVal = req.params.complete; // on
+  var insertBtn = "OK";
+
+  if (req.params.complete == "on") {
+    insertBtn = "X";
+  }
 
   listVO.findOne({ _id: _id }, function(err, result) {
-    res.render("insert", { list: result, delBtn: "OK" });
+    res.render("insert", { list: result, delBtn: "OK", insertBtn: insertBtn });
   });
 });
 
@@ -63,16 +59,41 @@ router.post("/delete", function(req, res) {
 });
 
 router.post("/checkupdate", function(req, res) {
+  // req.body.arr : id들이 들어있는 배열
   console.log("체크어레이2", req.body.arr);
 
-  req.body.cDate =
+  // var list = new listVO(req.body);
+  var arr = req.body.arr;
+
+  var date =
     moment().format("YYYY-MM-DD") + "(" + moment().format("HH:mm:ss") + ")";
 
-  req.body.complete = "ok";
+  // req.body.complete = "ok";
 
-  var list = new listVO(req.body);
+  // 배열 내부에 요소가 1개 있을 때는 forEach 에러
+  if (arr.length == 24) {
+    listVO.update(
+      { _id: arr },
+      { $set: { cDate: date, complete: "ok" } },
+      function(err, data) {}
+    );
 
-  listVO.collection.updateMany({ _id: req.body.arr }, req.body, function(
+    res.send("체크 완료");
+  }
+
+  arr.forEach(function(item) {
+    console.log("리스트 넘어", item);
+
+    listVO.update(
+      { _id: item },
+      { $set: { cDate: date, complete: "ok" } },
+      function(err, data) {}
+    );
+  });
+
+  res.send("체크 완료");
+  /*
+  listVO.collection.updateMany({ _id: req.body.arr }, {$set : { complete :"ok"} ,req.body, function(
     err,
     result
   ) {
@@ -83,6 +104,7 @@ router.post("/checkupdate", function(req, res) {
       res.redirect("/");
     }
   });
+  */
 });
 
 module.exports = router;

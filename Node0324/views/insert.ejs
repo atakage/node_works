@@ -5,12 +5,31 @@
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
   </head>
 
+  <!-- Latest compiled and minified CSS -->
+  <link
+    rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+  />
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>
     $(function() {
       $("#insertButton").click(function() {
         // 서버에서 공백검사
-        if ($("#title").val().length < 1) {
+        if (
+          $("#title")
+            .val()
+            .trim().length < 1
+        ) {
           alert("제목을 입력핫요");
           return false;
         }
@@ -42,33 +61,52 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-  <body>
-    <form action="/list/insert" method="post">
-      <input type="hidden" name="_id" value="<%= list._id %>" />
+  <body class="col-xs-x" style="text-align: center;">
+    <div class="container-md">
+      <form action="/list/insert" method="post">
+        <input type="hidden" name="_id" value="<%= list._id %>" />
 
-      <div>
-        <input
-          id="title"
-          name="title"
-          placeholder="제목"
-          value="<%= list.title %>"
-        />
-      </div>
-      <div>
-        <textarea id="content" name="content" placeholder="내용">
+        <div>
+          <input
+            class="form-control"
+            id="title"
+            name="title"
+            placeholder="제목"
+            value="<%= list.title %>"
+          />
+        </div>
+        <div>
+          <textarea
+            class="form-control"
+            rows="5"
+            id="content"
+            name="content"
+            placeholder="내용"
+            style="margin-bottom: 5%; margin-top: 2%;"
+          >
 <%= list.content %></textarea
+          >
+          <input name="insertDate" type="hidden" />
+        </div>
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          onclick="document.location.href='/'"
         >
-        <input name="insertDate" type="hidden" />
-      </div>
+          홈으로
+        </button>
 
-      <button type="button" onclick="document.location.href='/'">홈으로</button>
-      <button id="insertButton" type="button">작성완료</button>
+        <% if(insertBtn == "OK"){ %>
 
-      <% if(delBtn == "OK"){ %>
+        <button id="insertButton" type="button" class="btn btn-light">
+          작성완료
+        </button>
 
-      <button class="deleteButton" type="button">삭제</button>
-
-      <% }%>
-    </form>
+        <% }%> <% if(delBtn == "OK"){ %>
+        <button class="deleteButton btn btn-danger" type="button">삭제</button>
+        <% }%>
+      </form>
+    </div>
   </body>
 </html>

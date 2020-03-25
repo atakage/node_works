@@ -41,6 +41,7 @@
           type: "post",
           success: function(result) {
             alert(result);
+            document.location.href = "/";
           },
           error: function() {
             alert("서버 에러");
@@ -61,20 +62,35 @@
           .children("._id")
           .text();
 
-        alert(_id);
+        // on일 시 checked
+        var complete = $(this)
+          .find(".checkedBox")
+          .val();
 
-        document.location.href = "/list/update/" + _id;
+        // var complete = $(this).find(".checkedBox").val;
+
+        // alert(_id + "," + complete);
+
+        document.location.href = "/list/update/" + _id + "/" + complete;
       });
     });
   </script>
 
   <body>
-    <div class="col-xs-x" style="text-align: center;display: grid;">
-      <h1><%= title %></h1>
+    <div class="container-md" style="text-align: center;display: grid;">
+      <h1 class="jumbotron"><%= title %></h1>
 
       <div class="buttonGroup">
-        <button id="insertButton" type="button">작성</button>
         <button
+          class="btn btn-light"
+          id="insertButton"
+          type="button"
+          style="float:left"
+        >
+          작성
+        </button>
+        <button
+          class="btn btn-danger"
           id="checkSubmitButton"
           type="button"
           style="visibility: hidden; float: right;"
@@ -83,7 +99,10 @@
         </button>
       </div>
 
-      <table style="text-align: center;">
+      <table
+        class="table table-dark table-striped"
+        style="text-align: center; table-layout: fixed;"
+      >
         <tr>
           <th>제목</th>
           <th>내용</th>
@@ -102,13 +121,30 @@
 
         <tr class="trClick">
           <td class="_id" style="display: none;"><%= l._id%></td>
-          <td><%= l.title %></td>
-          <td><%= l.content %></td>
-          <td><%= l.insertDate %></td>
+          <td
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            <%= l.title %>
+          </td>
+          <td
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            <%= l.content %>
+          </td>
+          <td
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            <%= l.insertDate %>
+          </td>
           <td onclick="event.cancelBubble=true">
             <% if(l.complete == "ok"){ %>
 
-            <input type="checkbox" checked="checked" disabled="disabled" />
+            <input
+              class="checkedBox"
+              type="checkbox"
+              checked="checked"
+              disabled="disabled"
+            />
 
             <% }else{ %>
 
@@ -121,7 +157,11 @@
 
             <% } %>
           </td>
-          <td><%= l.cDate %></td>
+          <td
+            style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+          >
+            <%= l.cDate %>
+          </td>
         </tr>
 
         <% }) %>

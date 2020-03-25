@@ -1,7 +1,6 @@
 var mongoose = require("mongoose");
 
 var tbl_list = mongoose.Schema({
-  // __id는 생성됨
   //  제목
   title: {
     type: String,
