@@ -36,3 +36,32 @@
     transform: rotate(360deg);
   }
 }
+
+.boxDiv {
+  width: 70%;
+  border: 2px solid black;
+  margin: 0 auto;
+  margin-top: 5%;
+  padding: 20px;
+}
+
+.detailIdH3 {
+  background: black;
+  color: white;
+  text-align: center;
+}
+
+.detailContent {
+  font-size: larger;
+  font-weight: bold;
+}
+
+.goList {
+  text-align: center;
+  font-size: larger;
+  background-color: blanchedalmond;
+}
+
+.goList:hover {
+  color: white;
+}

@@ -8,12 +8,14 @@ class bbsList extends Component {
     });
 
     return (
-      <table className="table table-all">
-        <tr>
-          <th>날짜</th>
-          <th>작성자</th>
-          <th>제목</th>
-        </tr>
+      <table className="table table-all table-striped table-hover">
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>작성자</th>
+            <th>제목</th>
+          </tr>
+        </thead>
         {bbsMap}
       </table>
     );
