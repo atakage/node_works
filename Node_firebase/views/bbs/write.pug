@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+    script.
+        $(function(){
+            $('.bbs-list').click(function(){
+                ducoument.location.href='/bbs'
+            })
+            $('.bbs-write').click(function(){
+                $('form').submit()
+            })
+        })
+    section.container-fluid.p-5
+        form(method='POST')
+            div.form-group
+                input#b_title(name='b_title',placeholder='제목').form-control
+            div.form-group
+                input#b_writer(name='b_writer',placeholder='작성자').form-control
+            div.form-group
+                input#b_text(name='b_text',placeholder='내용').form-control
+            div.form-group.text-right.p-2
+                input(type="button", value="저장").btn.btn-primary.bbs-write.m-1
+                input(type="button", value="리스트").btn.btn-success.bbs-list.m-1
