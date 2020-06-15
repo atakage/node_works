@@ -1,0 +1,30 @@
+extends ../layout
+
+block content
+    
+    script.
+        $(function(){
+            $('button.btn-primary').click(function(){
+                document.location.href= '/bbs'
+            })
+            $('button.btn-success').click(function(){
+                document.location.href='/bbs/update/!{bbsList.seq}'
+            })
+            $('button.btn-warning').click(function(){
+                if(confirm('게시물을 삭제할까요')){
+                    document.location.href='/bbs/delete/!{bbsList.seq}'
+                }
+                
+            })
+        })
+
+    section.container-fluid
+        div.card
+            div.card-title= bbsList.b_title
+            div.card-body= bbsList.b_text
+            div.card-footer= bbsList.b_writer
+
+    section.container-fluid.text-right
+        button.btn.btn-primary.m-2 리스트
+        button.btn.btn-success.m-2 수정
+        button.btn.btn-warning.m-2 삭제

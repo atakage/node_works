@@ -85,7 +85,6 @@ router.get("/input", (req, res) => {
 
 router.post("/input", (req, res) => {
   let seq = req.body.seq;
-  console.log("body:" + JSON.stringify(req.body));
 
   //1. db schema에 접속하기
   // firebaseDB는 접속하는 방법이 인터넷을 통한 클라우드 네트워크에 접속하는 것이므로
@@ -97,8 +96,8 @@ router.post("/input", (req, res) => {
 
   // form에서 전송되어온 seq값이 없으면 새로운 seq를 생성하여 insert 상태로 만들고
   // 날짜와 시각을 생성하여 db에 추가
+  // js에서 "", undefined: false
   if (!seq) {
-    console.log("IF!");
     // moment를 사용하여 현재 날짜를 년-월-일 형태의 문자열로 추출하기
     let bDate = moment().format("YYYY[-]MM[-]DD");
     let bTime = moment().format("HH:mm:ss");

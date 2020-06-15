@@ -19,8 +19,8 @@ block content
             div.form-group
                 input#b_text(name='b_text',placeholder='내용', value=bbs.b_text).form-control
             div.form-group.text-right.p-2
-                input(type='hidden', name='b_date', value=bbs.b_date)
-                input(type='hidden', name='b_time', value=bbs.b_time)
-                input(type='hidden', name='seq', value=bbs.seq)
                 input(type="button", value="저장").btn.btn-primary.bbs-write.m-1
                 input(type="button", value="리스트").btn.btn-success.bbs-list.m-1
+                input(type='hidden', name='b_date', value= bbs.b_date)
+                input(type='hidden', name='b_time', value= bbs.b_time)
+                input(type='hidden', name='seq', value= bbs.seq)
