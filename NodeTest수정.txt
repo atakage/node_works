@@ -1,0 +1,285 @@
+NodeTest 수정
+
+
+
+-------------------------login.pug--------------------------------------------------아래
+
+
+include include-head
+
+style
+    include ../css/login.css
+
+script.
+
+    function removeSpace(obj){
+        var val = $('.joinPass').val().replace(/ /gi,'')
+        $('.joinPass').val(val)
+    }
+
+
+
+    $(function(){
+
+        var checkIdSW = 0
+        
+        $('.joinId').keyup(function(event){
+            if(!(event.keyCode >= 37 && event.keyCode <= 40)){
+                var inputVal = $(this).val()
+                $(this).val(inputVal.replace(/[^a-z0-9]/gi,''))
+            }
+        })
+
+
+
+        $('.checkIdBtn').click(function(){
+            var id = $('.joinId').val()
+            
+            $.ajax({
+                url:'/member/checkid', data:{id:id}, type:'post',
+                success:function(result){
+                    if(result == 'CHECKOK'){
+                        alert('확인 완료')
+                        checkIdSW = 1
+                    }else{
+                        alert('이미 존재하는 아이디입니다')
+                        checkIdSW = 0
+                    }
+                }
+            })
+        })
+
+
+
+
+
+        $('.joinBtn').click(function(){
+
+            if($('.joinId').val().length > 8 || $('.joinId').val().length < 4){
+                alert('아이디는 4자 이상 8자 이하입니다')
+                $('.joinId').focus()
+                return false
+            }
+
+           
+
+            if($('.joinPass').val().length < 10){
+                alert('비밀번호는 10자 이상입니다')
+                $('.joinPass').focus()
+                return false
+            }
+
+            if($('.joinPass').val() != $('.joinRePass').val()){
+                alert('비밀번호를 다시 확인해주세요')
+                $('.joinPass').focus()
+                return false
+            }
+
+            if(checkIdSW != 1){
+                alert('아이디 중복 체크가 필요합니다')
+                return false
+            }
+
+            $('.joinForm').submit()
+        })
+    })
+
+body
+
+    div.loginAndJoinBoxDiv
+        div.loginBox
+            form(action="/member/login", method="post")
+                div.logTitle LOGIN
+                div
+                    input(placeholder='ID', maxlength='8').logId
+                div
+                    input(type='password', maxlength='20', placeholder='PASSWORD').logPass
+                div
+                    button(type='button').loginBtn 로그인
+        div.joinBox
+            form(action="/member/join", method="post").joinForm
+                div.joinTitle 빠른 회원가입
+                div.idAndCheckBoxDiv
+                    div
+                        input(placeholder='아이디(4자 이상 8자 이하)', maxlength='8', name='id').joinId
+                    div
+                        button(type='button').checkIdBtn 중복 체크
+                div
+                    input(type='password', maxlength='20',placeholder='비밀번호(10자 이상)', name='password', onkeyup="removeSpace(this);").joinPass
+                div
+                    input(type='password', maxlength='20',placeholder='비밀번호 확인').joinRePass
+                div
+                    select(name="grade")
+                        option(value="N") 일반(민원)
+                        option(value="P") 공무원
+                div(style="text-align:right")
+                    button(type='button').joinBtn 가입
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+프로젝트 root에 models 폴더 생성 후 member.js 만들기
+
+
+member테이블
+(_id) unique
+id(8) not null
+password(20) not null
+grade(1) not null
+
+
+npm install mongoose
+mongodb 접속 후 use dumpdb로 dbㅅ행성
+app.js에서 mongo 설정
+
+----------------------------------------------------login.css-------------------------------------------------------------------- 아래
+
+
+.loginAndJoinBoxDiv {
+  margin: 0 auto;
+  margin-top: 5%;
+  width: fit-content;
+}
+
+.loginBox {
+  border: 3px solid coral;
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.logTitle {
+  font-weight: bold;
+  font-size: large;
+  background-color: coral;
+  margin-bottom: 5%;
+}
+
+.loginBtn {
+  margin-top: 5%;
+  border: 2px solid coral;
+}
+
+.joinBox {
+  border: 3px solid coral;
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 5%;
+}
+
+.joinTitle {
+  font-weight: bold;
+  font-size: large;
+  background-color: coral;
+  margin-bottom: 5%;
+  text-align: center;
+}
+
+.joinBtn {
+  margin-top: 5%;
+  border: 2px solid coral;
+}
+
+.idAndCheckBoxDiv {
+  display: flex;
+}
+
+.checkIdBtn {
+  font-size: small;
+}
+
+-------------------------------------------------------------------------------
+
+
+
+---------------------------------------------member.js--------------------------------------------------------아래
+
+
+var mongoose = require("mongoose");
+var memberModel = mongoose.Schema({
+  id: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+
+  password: {
+    type: String,
+    required: true,
+  },
+
+  grade: {
+    type: String,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("tbl_member", memberModel);
+
+----------------------------------------------------------------------------------------------------------
+
+
+
+------------------------------------------memberRouter.js------------------------------------------------아래
+
+var express = require("express");
+var router = express.Router();
+var memberVO = require("../models/member");
+
+router.get("/login", function (req, res) {
+  res.render("login");
+});
+
+router.post("/checkid", function (req, res) {
+  console.log(req.body.id);
+
+  memberVO.findOne({ id: req.body.id }, function (err, data) {
+    if (data == null) {
+      res.end("CHECKOK");
+    }
+    res.end("NO");
+  });
+});
+
+router.post("/join", function (req, res) {
+  let id = req.body.id.replace(/ /g, "");
+  let password = req.body.password.replace(/ /g, "");
+  let grade = req.body.grade.replace(/ /g, "");
+
+  console.log(JSON.stringify(req.body));
+
+  // server에서 2차 검사
+  if (
+    id.length > 8 ||
+    id.length < 4 ||
+    password.length < 10 ||
+    password.length > 20 ||
+    !grade == "N" ||
+    !grade == "P"
+  ) {
+    res.redirect("/member/login");
+  }
+
+  console.log("검증통과");
+  var joinMemberVO = new memberVO(req.body);
+
+  console.log("생성완료");
+
+  joinMemberVO.save(req.body, function (err, data) {
+    res.redirect("/");
+  });
+});
+
+module.exports = router;
+
+
+-------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,30 @@
+include include-head
+
+style
+  include ../css/index.css
+
+script(src='//dapi.kakao.com/v2/maps/sdk.js?appkey=fec4d99316e52193dbce501d153897b3')
+
+script(type='text/javascript').
+  document.addEventListener('DOMContentLoaded',function(event){
+
+  var container = document.getElementById('map')
+  var options = {
+    center:new kakao.maps.LatLng(33.450701, 126.570667),
+    level:3
+  };
+  var map = new kakao.maps.Map(container, options);
+
+  })
+  
+  $(function(){
+
+  })
+
+
+div.mapAndChartBoxDiv
+  div#map.mapBoxDiv
+  div.chartBoxDiv
+
+
+input(type='hidden', value=MSG).msgInput

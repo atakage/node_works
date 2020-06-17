@@ -1,0 +1,54 @@
+.loginAndJoinBoxDiv {
+  margin: 0 auto;
+  margin-top: 5%;
+  width: fit-content;
+}
+
+.loginBox {
+  border: 3px solid coral;
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.logTitle {
+  font-weight: bold;
+  font-size: large;
+  background-color: coral;
+  margin-bottom: 5%;
+}
+
+.loginBtn {
+  margin-top: 5%;
+  border: 2px solid coral;
+}
+
+.joinBox {
+  border: 3px solid coral;
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 5%;
+}
+
+.joinTitle {
+  font-weight: bold;
+  font-size: large;
+  background-color: coral;
+  margin-bottom: 5%;
+  text-align: center;
+}
+
+.joinBtn {
+  margin-top: 5%;
+  border: 2px solid coral;
+}
+
+.idAndCheckBoxDiv {
+  display: flex;
+}
+
+.checkIdBtn {
+  font-size: small;
+}
