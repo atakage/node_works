@@ -23,6 +23,13 @@ script.
             }
         })
 
+        $('.logId').keyup(function(event){
+            if(!(event.keyCode >= 37 && event.keyCode <= 40)){
+                var inputVal = $(this).val()
+                $(this).val(inputVal.replace(/[^a-z0-9]/gi,''))
+            }
+        })
+
 
 
         $('.checkIdBtn').click(function(){
@@ -75,18 +82,55 @@ script.
 
             $('.joinForm').submit()
         })
+
+
+
+        $('.loginBtn').click(function(){
+            
+            if($('.logId').val().length < 1){
+                alert('아이디를 입력해주세요')
+                $('.logId').focus()
+                return false
+            }
+
+            if($('.logPass').val().length < 1){
+                alert('비밀번호를 입력해주세요')
+                $('.logPass').focus()
+                return false
+            }
+
+            
+            var id = $('.logId').val()
+            var password = $('.logPass').val()
+            $.ajax({
+                url:'/member/login', data:{id:id, password:password}, type:'post',
+                success:function(result){
+                    if(result == 'LOGINOK'){
+                        alert('로그인 성공')
+                        document.location.href = '/'
+                    }else{
+                        alert('아이디와 비밀번호를 확인해주세요')
+                        return false
+                    }
+                }, error:function(){
+                    alert('서버 에러')
+                }
+            })
+            
+
+        })
     })
 
 body
 
     div.loginAndJoinBoxDiv
         div.loginBox
-            form(action="/member/login", method="post")
+            form(action="/member/login", method="post").loginForm
                 div.logTitle LOGIN
                 div
-                    input(placeholder='ID', maxlength='8').logId
+                    input(placeholder='ID', maxlength='8', name='id').logId
                 div
-                    input(type='password', maxlength='20', placeholder='PASSWORD').logPass
+                    input(type='password', maxlength='20', name='password', placeholder='PASSWORD', onkeyup="removeSpace(this);").logPass
                 div
                     button(type='button').loginBtn 로그인
         div.joinBox
@@ -100,7 +144,7 @@ body
                 div
                     input(type='password', maxlength='20',placeholder='비밀번호(10자 이상)', name='password', onkeyup="removeSpace(this);").joinPass
                 div
-                    input(type='password', maxlength='20',placeholder='비밀번호 확인').joinRePass
+                    input(type='password', maxlength='20',placeholder='비밀번호 확인', onkeyup="removeSpace(this);").joinRePass
                 div
                     select(name="grade")
                         option(value="N") 일반(민원)

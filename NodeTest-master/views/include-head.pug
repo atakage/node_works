@@ -22,5 +22,11 @@ nav.navbar.navbar-expand-sm
     li.nav-item
       a.nav-link(href="#") 문의&답변  
     li.nav-item
-  ul.navbar-nav.ml-auto  
+  ul.navbar-nav.ml-auto
+    if userid
+      a.nav-link(href="/member/login") 로그아웃  
+    else  
       a.nav-link(href="/member/login") 로그인 
+  
+      
+

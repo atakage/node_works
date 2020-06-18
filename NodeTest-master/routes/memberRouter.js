@@ -3,7 +3,36 @@ var router = express.Router();
 var memberVO = require("../models/member");
 
 router.get("/login", function (req, res) {
+  // let session = req.session;
   res.render("login");
+});
+
+router.post("/login", async function (req, res, next) {
+  console.log(JSON.stringify(req.body));
+
+  let id = req.body.id;
+  let password = req.body.password;
+
+  memberVO.findOne(
+    {
+      id: id,
+      password: password,
+    },
+    // db select 후 result(data)값 size(length) 추출법
+    function (err, data) {
+      if (data == null) {
+        res.end("FAIL");
+        res.redirect("/");
+      } else {
+        req.session.userid = data.id;
+
+        res.end("LOGINOK");
+        console.log(data.id);
+
+        //res.render();
+      }
+    }
+  );
 });
 
 router.post("/checkid", function (req, res) {
