@@ -582,3 +582,264 @@ body
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 로그아웃처리하면됨
+
+
+
+
+
+
+20200619
+
+
+
+dumpReport.js 모델 컬럼(form)
+
+id (서버에서 session 추가)
+
+date(날짜 시간, 서버에서 추가)
+
+address
+
+(map(api로 입력된 주소 위치 표시))
+
+title
+
+description
+
+img
+
+confirm(검토 여부)
+
+complete(민원 처리 여부)
+
+
+-----------------------------------------include-head.css-------------------------------아래
+
+
+.headerTitle {
+  font-weight: bold;
+  text-align: center;
+  font-size: xx-large;
+  background-color: coral;
+  padding: 30px;
+}
+
+.nav-link {
+  font-size: large;
+  text-decoration: none;
+  color: black;
+  transition: 0.7s;
+}
+
+.nav-link:hover {
+  font-weight: bold;
+  color: black;
+  text-decoration: underline;
+  text-decoration-color: coral;
+}
+
+.displayUserId:hover {
+  font-weight: unset;
+}
+
+.headerTitle:hover {
+  cursor: pointer;
+}
+
+
+
+-------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------dumpReport.js---------------------------------------------
+
+var mongoose = require("mongoose");
+var reportModel = mongoose.Schema({
+  id: {
+    type: String,
+    required: true,
+    maxlength: 8,
+  },
+
+  date: {
+    type: String,
+    required: true,
+  },
+
+  address: {
+    type: String,
+    required: true,
+  },
+
+  title: {
+    type: String,
+    required: true,
+  },
+
+  description: {
+    type: String,
+  },
+
+  originalImg: {
+    type: String,
+  },
+
+  uploadImg: {
+    type: String,
+  },
+
+  confirm: {
+    type: Boolean,
+    default: false,
+  },
+
+  complete: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+module.exports = mongoose.model("tbl_report", reportModel);
+
+
+---------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------memberRouter.js-------------------------------------------------------
+
+var express = require("express");
+var router = express.Router();
+var memberVO = require("../models/member");
+
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
+router.get("/login", function (req, res) {
+  // let session = req.session;
+  res.render("login");
+});
+
+router.post("/login", async function (req, res, next) {
+  console.log(JSON.stringify(req.body));
+
+  let id = req.body.id;
+  let password = req.body.password;
+
+  memberVO.findOne(
+    {
+      id: id,
+    },
+    // db select 후 result(data)값 size(length) 추출법
+    function (err, data) {
+      console.log("SELECT: " + data);
+
+      if (!bcrypt.compareSync(password, data.password)) {
+        console.log("IF진입");
+        res.end("FAIL");
+      } else {
+        req.session.userid = data.id;
+        req.session.grade = data.grade;
+        res.end("LOGINOK");
+        console.log(data.id);
+
+        //res.render();
+      }
+    }
+  );
+});
+
+router.get("/logout", function (req, res) {
+  req.session.destroy();
+  res.clearCookie("sid");
+  res.redirect("/member/login");
+});
+
+router.post("/checkid", function (req, res) {
+  console.log(req.body.id);
+
+  memberVO.findOne({ id: req.body.id }, function (err, data) {
+    if (data == null) {
+      res.end("CHECKOK");
+    }
+    res.end("NO");
+  });
+});
+
+router.post("/join", function (req, res) {
+  let id = req.body.id.replace(/ /g, "");
+  let password = req.body.password.replace(/ /g, "");
+  let grade = req.body.grade.replace(/ /g, "");
+
+  console.log(JSON.stringify(req.body));
+
+  // server에서 2차 검사
+  if (
+    id.length > 8 ||
+    id.length < 4 ||
+    password.length < 10 ||
+    password.length > 20 ||
+    !grade == "N" ||
+    !grade == "P"
+  ) {
+    res.redirect("/member/login");
+  }
+
+  console.log("검증통과");
+
+  console.log("생성완료" + JSON.stringify(joinMemberVO));
+
+  req.body.password = bcrypt.hashSync(req.body.password, saltRounds);
+
+  console.log("암호화: " + req.body.password);
+  //req.body.id = "asdfgjklq";
+
+  // 생성되는 시점에 틀 뿐만 아니라 내용도 들어감 그렇기 때문에 req.body 전부 수정된 후(테이블에 넣기 바로 전)
+  var joinMemberVO = new memberVO(req.body);
+
+  joinMemberVO.save(req.body, function (err, data) {
+    res.redirect("/");
+  });
+});
+
+module.exports = router;
+
+------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------reportRouter.js------------------------------------------
+
+var express = require("express");
+var router = express.Router();
+
+router.get("/dumpreport", function (req, res) {
+  console.log("그레이드: " + req.session.grade);
+
+  if (!req.session.grade == "N" || req.session.grade == undefined) {
+    console.log("진입");
+
+    res.render("alert_page", { MSG: "일반 민원 계정으로 로그인이 필요합니다" });
+  } else {
+    res.render("write_dump_report");
+  }
+});
+
+module.exports = router;
+
+
+---------------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------alert_page.pug---------------------------------------------
+
+include include-head
+
+
+script.
+  
+    
+    alert('!{MSG}')
+    document.location.href = '/'
+
+
+--------------------------------------------------------------------------------------------------
+
