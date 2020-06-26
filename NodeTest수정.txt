@@ -843,3 +843,155 @@ script.
 
 --------------------------------------------------------------------------------------------------
 
+
+
+
+202006261044
+
+
+------------------------------------------write_dump_report.css--------------------------------------------
+
+.writeBoxDiv {
+  border: 2px solid coral;
+  box-shadow: 2px;
+  width: 70%;
+  margin: 0 auto;
+  box-shadow: 5px 5px 5px coral;
+  margin-top: 5%;
+  padding: 20px;
+}
+
+.paragraphDiv {
+  padding: 10px;
+}
+
+.findAddrBtn {
+  font-size: small;
+}
+
+.address {
+  width: 70%;
+}
+
+#map {
+  display: none;
+  max-width: 800px;
+  max-height: 700px;
+  width: 300;
+  height: 200px;
+}
+
+.preImg {
+  max-width: 200;
+  border: 1px solid;
+}
+
+.preImg::after {
+  content: "ㅇㅇ";
+}
+
+
+--------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------write_dump_report.pug----------------------------------------------
+
+include include-head
+
+script(src='//dapi.kakao.com/v2/maps/sdk.js?appkey=fec4d99316e52193dbce501d153897b3')
+
+style
+    include ../css/write_dump_report.css
+
+script.
+
+    var openWin
+    var map
+
+    function openChild(){
+        
+        // window.name = '부모창'
+        window.name = 'parentForm'
+
+        openWin = window.open('/report/findaddr', 'childForm', 'width=640, height=600, resizable=no' ) 
+    }
+
+   
+    document.addEventListener('DOMContentLoaded',function(event){
+        
+    var container = document.getElementById('map')
+    var options = {
+            center:new kakao.maps.LatLng(33.450701, 126.570667),
+            level:3
+    };
+     
+    map = new kakao.maps.Map(container, options);
+
+
+
+    })
+
+
+    function setCenter(){
+
+            var pointX = document.getElementById('pointX').value
+            var pointY = document.getElementById('pointY').value
+           
+
+        var container = document.getElementById('map')
+        var options = {
+            center:new kakao.maps.LatLng(pointY, pointX),
+            level:3
+    };
+         
+         markerPosition = new kakao.maps.LatLng(pointY,pointX)
+
+         var marker = new kakao.maps.Marker({
+             position : markerPosition
+         })
+
+         document.getElementById('map').style.display = 'block'
+         map = new kakao.maps.Map(container, options);
+         marker.setMap(map)
+         
+    }
+
+    function previewImg(event){
+        
+
+        for(var image of event.target.files){
+            var reader = new FileReader()
+
+            reader.onload = function(event){
+                var img = document.createElement('img')
+                img.setAttribute('src', event.target.result)
+                img.setAttribute('class', 'preImg')
+                document.querySelector('.previewImg').appendChild(img)
+            }
+            console.log(image)
+            reader.readAsDataURL(image)
+        }
+    }
+
+    
+
+div.writeBoxDiv
+    form()
+        div.paragraphDiv
+            span 작성자:
+            input.reportId(value=userid, readonly='readonly')
+        div.paragraphDiv
+            span 주소:
+            button.findAddrBtn(type='button', onclick='openChild()') 주소찾기
+            br
+            input#address.address(readonly='readonly')
+            input#pointX(type='hidden' readonly='readonly')
+            input#pointY(type='hidden' readonly='readonly')
+        div.paragraphDiv
+            div#map
+        div.paragraphDiv
+            div 사진 올리기
+            input.fileUpInput(type='file' onchange='previewImg(event)' multiple)
+            div.previewImg    
+        
+
+---------------------------------------------------------------------------------------------------------------------
