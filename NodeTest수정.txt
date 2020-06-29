@@ -995,3 +995,434 @@ div.writeBoxDiv
         
 
 ---------------------------------------------------------------------------------------------------------------------
+
+
+
+20200629
+
+
+--------------------------------------------------reportRouter.js--------------------------------------------------
+
+var express = require("express");
+var router = express.Router();
+var request = require("request");
+//var multipart = require('connect-multiparty');
+var path = require("path");
+var multer = require("multer");
+var moment = require("moment");
+var moment_timezone = require("moment-timezone");
+const async = require("async");
+var reportVO = require("../models/dumpReport");
+var fileVO = require("../models/file");
+
+moment.tz.setDefault("Asia/Seoul");
+
+//var multipartMiddleware = multipart();
+
+var SECRETKEY = "814C545C-2130-3873-91E9-3FD61E919CD9";
+var REQUESTURL = "http://api.vworld.kr/req/search?key=" + SECRETKEY;
+
+var saveOptions = multer.diskStorage({
+  destination: (req, file, callBackFunc) => {
+    console.log("desFILE: " + JSON.stringify(file));
+    var uploadPath = path.join(__dirname, "/../", "public", "uploads");
+    console.log("UPLOADPATH: " + uploadPath);
+    callBackFunc(null, uploadPath);
+  },
+  filename: (req, file, callBackFunc) => {
+    console.log("FILENAME: " + JSON.stringify(file));
+
+    var mimeType;
+
+    switch (file.mimetype) {
+      case "image/jpeg":
+        mimeType = ".jpg";
+        break;
+
+      case "image/png":
+        mimeType = ".png";
+        break;
+
+      case "image/gif":
+        mimeType = ".gif";
+        break;
+
+      case "image/bmp":
+        mimeType = ".bmp";
+        break;
+
+      default:
+        mimeType = ".jpg";
+        break;
+    }
+
+    var uploadFileName = Date.now() + "_" + mimeType;
+    callBackFunc(null, uploadFileName);
+  },
+});
+
+var saveFile = multer({ storage: saveOptions }).array("originalImg");
+
+router.get("/dumpreport", function (req, res) {
+  console.log("그레이드: " + req.session.grade);
+
+  if (req.session.grade != "N" || req.session.grade == undefined) {
+    console.log("진입");
+
+    res.render("alert_page", { MSG: "일반 민원 계정으로 로그인이 필요합니다" });
+  } else {
+    res.render("write_dump_report");
+  }
+});
+
+router.get("/findaddr", function (req, res) {
+  res.render("find_address");
+});
+
+router.post("/searchaddr", function (req, res) {
+  var searchAddrVal = req.body.searchAddrVal;
+
+  let api_url = encodeURI(REQUESTURL);
+
+  api_url +=
+    "&request=search&query=" +
+    encodeURI(searchAddrVal) +
+    "&type=ADDRESS&category=ROAD&size=1000";
+
+  console.log(api_url);
+  request(api_url, (err, response, data) => {
+    console.log("진입");
+    console.log(JSON.stringify(data));
+    if (err) {
+      console.log("에러진입");
+      console.log(err);
+      return "ERROR";
+    } else {
+      console.log("진입2");
+
+      try {
+        var items = JSON.parse(data).response.result.items;
+        console.log("최종: " + JSON.stringify(items));
+        res.send(items);
+      } catch (e) {
+        console.log(e);
+        //return "ERROR";
+        res.send("ERROR");
+      }
+    }
+  });
+});
+
+router.post("/checkreportdata", function (req, res) {
+  console.log("결과: " + JSON.stringify(req.body));
+  console.log("파일결과: " + JSON.stringify(req.files));
+
+  saveFile(req, res, (err) => {
+    if (err) {
+      console.log(err);
+      //res.send("fail");
+    } else {
+      // originalname : 원본 파일 이름
+      // filename : 가공된 파일 이름
+      console.log("ORIGINALNAME: " + JSON.stringify(req.files));
+      console.log("LENGTH: " + req.files.length);
+
+      req.body.id = req.session.userid;
+      req.body.date = moment().format("YYYY[-]MM[-]DD");
+      req.body.time = moment().format("HH:mm:ss");
+
+      var newReportVO = new reportVO(req.body);
+
+      console.log("REPORTVO: " + newReportVO);
+      // report 먼저 insert
+      newReportVO.save(function (err, data) {
+        if (err) {
+          //res.send("fail");
+        }
+
+        console.log("REPORTINSERTCOMPLETE!!");
+
+        // 업로드된 이미지 length만큼 file테이블에 insert
+        for (var i = 0; i < req.files.length; i++) {
+          //async.each(req.files,function(){
+          console.log("foreach진입");
+          req.body.fileId = data._id;
+          req.body.originalImg = req.files[i].originalname;
+          req.body.uploadImg = req.files[i].filename;
+          //req.body.fileCode = ''
+
+          //async.waterfall([
+
+          // filecode max값 찾음(sort이용), data는 vo전체가 출력됨                       -------------------- 1번 실행
+
+          /*
+          fileVO
+            .findOne()
+            .sort("-fileCode")
+            .exec(function (err, data) {
+              console.log("FINDMAXCODE진입!!");
+              if (err) {
+                console.log("FINDONEFAILE: " + err);
+                res.send("fail");
+              }
+
+              if (data == null) {
+                console.log("널");
+                req.body.fileCode = "F0000";
+              } else {
+                console.log("MAXFILECODE: " + data.fileCode);
+                var number = data.fileCode.substring(1);
+                console.log("SUBSTR: " + number);
+                var parseIntVal = parseInt(number) + parseInt(1);
+                console.log("PARSEINT: " + parseIntVal);
+                console.log("PARSEINTLENG: " + parseIntVal.toString().length);
+
+                var zero = "";
+                for (var i = parseIntVal.toString().length; i < 4; i++) {
+                  zero += "0";
+                  console.log("ZERO: " + zero);
+                }
+                req.body.fileCode = "F" + zero + parseIntVal;
+              }
+              console.log("FILECODE: " + req.body.fileCode);
+            });
+            */
+
+          //-------------------------------------------------------------------1번 실행
+
+          //----------------------------------------------------------------------2번 실행
+          console.log("Insert전reqbody: " + JSON.stringify(req.body));
+
+          // 최종 insert
+          var newFileVO = new fileVO(req.body);
+          newFileVO.save(function (err, data) {
+            if (err) {
+              console.log(err);
+              //res.send("FAIL");
+            }
+            console.log("FILERE: " + JSON.stringify(data));
+            console.log("COMPLETE!!!");
+          });
+          //--------------------------------------------------------------------------2번 실행
+
+          //
+
+          //}
+
+          //])
+          //})
+        }
+        res.send("SUCCESS");
+        // report 및 모든 이미지 업로드 완료
+      });
+    }
+  });
+});
+
+module.exports = router;
+
+--------------------------------------------------------------------------------------------------------
+
+----------------------------------------write_dump_report.pug--------------------------------------
+
+include include-head
+
+script(src='//dapi.kakao.com/v2/maps/sdk.js?appkey=fec4d99316e52193dbce501d153897b3')
+
+style
+    include ../css/write_dump_report.css
+
+script.
+
+    var openWin
+    var map
+
+    function openChild(){
+        
+        // window.name = '부모창'
+        window.name = 'parentForm'
+
+        openWin = window.open('/report/findaddr', 'childForm', 'width=640, height=600, resizable=no' ) 
+    }
+
+   
+    document.addEventListener('DOMContentLoaded',function(event){
+        
+    var container = document.getElementById('map')
+    var options = {
+            center:new kakao.maps.LatLng(33.450701, 126.570667),
+            level:3
+    };
+     
+    map = new kakao.maps.Map(container, options);
+
+
+
+    })
+
+
+    function setCenter(){
+
+            var pointX = document.getElementById('pointX').value
+            var pointY = document.getElementById('pointY').value
+           
+
+        var container = document.getElementById('map')
+        var options = {
+            center:new kakao.maps.LatLng(pointY, pointX),
+            level:3
+    };
+         
+         markerPosition = new kakao.maps.LatLng(pointY,pointX)
+
+         var marker = new kakao.maps.Marker({
+             position : markerPosition
+         })
+
+         document.getElementById('map').style.display = 'block'
+         map = new kakao.maps.Map(container, options);
+         marker.setMap(map)
+         
+    }
+
+    function previewImg(event){
+        
+        document.getElementById('previewImg').innerHTML = ''
+        for(var image of event.target.files){
+            var reader = new FileReader()
+
+            reader.onload = function(event){
+
+                var img = document.createElement('img')
+                img.setAttribute('src', event.target.result)
+                img.setAttribute('class', 'preImg')
+
+                var div = document.createElement('div')
+                div.setAttribute('class', 'imgAndTimesBoxDiv')
+                
+                var span = document.createElement('span')
+                span.setAttribute('class', 'closeSpan')
+                span.setAttribute('onclick', 'cancelImg(this)')
+                span.innerHTML = '&times;'
+
+                document.querySelector('.previewImg').appendChild(div)
+                div.appendChild(img)
+               // div.appendChild(span)
+            }
+            console.log(image)
+            reader.readAsDataURL(image)
+        }
+    }
+
+
+    function  cancelImg(el){
+        el.closest('.imgAndTimesBoxDiv').remove()
+    }
+
+
+    $(function(){
+        $('.inputBtn').click(function(){
+
+
+            if($('.address').val().replace(/ /gi,'').length < 1){
+                alert('주소를 입력하세요')
+                return false
+            }
+
+
+            if(!$('.fileUpInput').val()){
+                alert('최소 1장 이상의 현장 사진 업로드가 필요합니다')
+                return false
+            }
+
+            if($('.title').val().replace(/ /gi,'').length < 1){
+                alert('제목을 입력하세요')
+                return false
+            }
+
+            if($('.description').val().replace(/ /gi,'').length < 1){
+                alert('내용을 입력하세요')
+                return false
+            }
+
+            // server로 데이터 보내 유효성 검사 및 등록
+            var form = $('#reportForm')[0]
+            var formData = new FormData(form)
+
+            $.ajax({
+                url:'/report/checkreportdata', data:formData, type:'post', processData:false, contentType:false, enctype:'multipart/form-data',
+                success:function(result){
+                    if(result == 'SUCCESS'){
+                        alert('등록 완료')
+                        document.location.href = '/'
+                    }else{
+                        alert('등록 실패')
+                        return false
+                    }
+                },error:function(){
+                    alert('서버 에러')
+                }
+            })
+        })
+    })
+
+    
+
+div.writeBoxDiv
+    form#reportForm(method='post' enctype='multipart/form-data')
+        div.paragraphDiv
+            span 작성자:
+            input.reportId(value=userid, readonly='readonly')
+        div.paragraphDiv
+            span 주소(불법투기현장):
+            button.findAddrBtn(type='button', onclick='openChild()') 주소찾기
+            br
+            input#address.address(name='address' readonly='readonly')
+            input#pointX(type='hidden' readonly='readonly')
+            input#pointY(type='hidden' readonly='readonly')
+        div.paragraphDiv
+            div#map
+        div.paragraphDiv
+            div 사진 올리기
+            input.fileUpInput(name='originalImg' type='file' onchange='previewImg(event)' accept='image/*' multiple)
+            div.previewImg#previewImg 
+        div.paragraphDiv
+            input.title(name='title' placeholder='제목' maxlength='20')
+        div.paragraphDiv
+            textarea.description(name='description' cols="50" rows="10" placeholder='내용')
+        div.paragraphDiv
+            button.inputBtn(type='button') 등록
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+-------------------------------file.js-----------------------------------------------------------------
+
+var mongoose = require("mongoose");
+var fileModel = mongoose.Schema({
+  //  insert할 때 dumpReport의 _id 복붙
+  fileId: {
+    type: String,
+    required: true,
+  },
+  /*
+    fileCode: {
+        type:String,
+        required:true,
+        unique: true,
+    },
+*/
+  originalImg: {
+    type: String,
+    required: true,
+  },
+
+  uploadImg: {
+    type: String,
+    required: true,
+  },
+});
+
+module.exports = mongoose.model("tbl_file", fileModel);
+
+------------------------------------------------------------------------------------------------------------
